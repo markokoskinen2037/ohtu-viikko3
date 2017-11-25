@@ -1,5 +1,4 @@
 
-
 import ohtu.matkakortti.Matkakortti;
 import ohtu.matkakortti.Kassapaate;
 import org.junit.Before;
@@ -12,21 +11,21 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public class KassapaateTest {
-    
+
     Kassapaate kassa;
     Matkakortti kortti;
-    
-   @Before
+
+    @Before
     public void setUp() {
         kassa = new Kassapaate();
         kortti = mock(Matkakortti.class);
     }
-    
+
     @Test
     public void kortiltaVelotetaanHintaJosRahaaOn() {
         when(kortti.getSaldo()).thenReturn(10);
         kassa.ostaLounas(kortti);
-        
+
         verify(kortti, times(1)).getSaldo();
         verify(kortti).osta(eq(Kassapaate.HINTA));
     }
@@ -35,8 +34,25 @@ public class KassapaateTest {
     public void kortiltaEiVelotetaJosRahaEiRiita() {
         when(kortti.getSaldo()).thenReturn(4);
         kassa.ostaLounas(kortti);
-        
+
         verify(kortti, times(1)).getSaldo();
         verify(kortti, times(0)).osta(anyInt());
+    }
+
+    @Test
+    public void kortilleLisätäänRahaaJosSummaPosiviitinen() {
+        when(kortti.getSaldo()).thenReturn(10); //Kortilla alussa 10€ rahaa
+        kassa.lataa(kortti, 5); //Kortilla pitäs olla rahaa 15€
+
+        verify(kortti, times(1)).lataa(5);
+    }
+
+    @Test
+    public void kortilleEiLisätäRahaaJosSummaNegatiivinen() {
+        when(kortti.getSaldo()).thenReturn(10); //Kortilla alussa 10€ rahaa
+        kassa.lataa(kortti, -5); //Kortilla pitäs olla rahaa 15€
+
+        verify(kortti, times(0)).lataa(-5);
+
     }
 }
